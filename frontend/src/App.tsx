@@ -50,6 +50,18 @@ function toAppointmentVM(rows: Awaited<ReturnType<typeof api.appointments>>): Ap
   }));
 }
 
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <Card className="bento-item border-none shadow-2xl hover:-translate-y-1 transition-all duration-500 bg-gradient-to-br from-slate-50 to-white p-8 flex flex-col items-start text-left group">
+      <div className="mb-6 p-4 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-500">
+        {icon}
+      </div>
+      <h3 className="text-xl font-black mb-3 tracking-tight">{title}</h3>
+      <p className="text-muted-foreground font-medium leading-relaxed">{description}</p>
+    </Card>
+  );
+}
+
 export default function App() {
   const googleClientId = useContext(GoogleClientIdContext);
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -636,17 +648,5 @@ export default function App() {
         </div>
       </footer>
     </div>
-  );
-}
-
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <Card className="bento-item border-none shadow-2xl hover:-translate-y-1 transition-all duration-500 bg-gradient-to-br from-slate-50 to-white p-8 flex flex-col items-start text-left group">
-      <div className="mb-6 p-4 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-500">
-        {icon}
-      </div>
-      <h3 className="text-xl font-black mb-3 tracking-tight">{title}</h3>
-      <p className="text-muted-foreground font-medium leading-relaxed">{description}</p>
-    </Card>
   );
 }
