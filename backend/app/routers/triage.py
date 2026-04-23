@@ -15,7 +15,6 @@ router = APIRouter(prefix="/triage", tags=["triage"])
 @router.post("", response_model=TriageOut)
 def triage(
     body: TriageIn,
-    _user: Annotated[User, Depends(get_current_user)],
     _db: Annotated[Session, Depends(get_db)],
 ):
     data = perform_triage(body.description)

@@ -20,7 +20,6 @@ def get_availability(
     date_str: str = Query(..., alias="date", description="YYYY-MM-DD"),
     urgency: UrgencyEnum = Query(...),
     db: Annotated[Session, Depends(get_db)] = ...,
-    _user: Annotated[User, Depends(get_current_user)] = ...,
 ):
     try:
         d = date.fromisoformat(date_str)
