@@ -10,7 +10,7 @@ El modelo de riesgo de inasistencia usa **regresión logística entrenada en Pyt
 
 ## Configuración
 
-1. Base de datos: copia `backend/.env.example` a `backend/.env` y ajusta `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAILS` (correos con rol admin), `GEMINI_API_KEY` (opcional, triaje con IA) y `GOOGLE_CLIENT_ID` (opcional, login Google en backend).
+1. Base de datos: copia `backend/.env.example` a `backend/.env` y ajusta `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAILS` (correos con rol admin), `ROQ_API_KEY` (opcional, triaje con IA) y `GOOGLE_CLIENT_ID` (opcional, login Google en backend).
 
 2. Frontend: copia `frontend/.env.example` a `frontend/.env` y define `VITE_API_URL` (por defecto `http://127.0.0.1:8000`). Opcional: `VITE_GOOGLE_CLIENT_ID` alineado con el de Google Cloud.
 
@@ -45,7 +45,7 @@ alembic upgrade head
 
 ## RAG y asistente AI
 
-Este proyecto incluye un asistente RAG que usa fuentes internas y externas de datos para enriquecer respuestas de consulta. El endpoint disponible es `POST /assistant` y requiere el mismo `GEMINI_API_KEY` usado para el triaje en `/triage`.
+Este proyecto incluye un asistente RAG que usa fuentes internas y externas de datos para enriquecer respuestas de consulta. El endpoint disponible es `POST /assistant` y requiere el mismo `ROQ_API_KEY` usado para el triaje en `/triage`.
 
 ## Documentación adicional
 
