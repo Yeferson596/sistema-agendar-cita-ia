@@ -68,12 +68,12 @@ def _retrieve_relevant_context(question: str, docs: Dict[str, str]) -> tuple[str
     return context, sources
 
 
-def _generate_gemini_response(question: str, context: str) -> str:
-    """Genera respuesta usando GROQ (Llama 3) con el contexto proporcionado."""
+def _generate_roq_response(question: str, context: str) -> str:
+    """Genera respuesta usando Roq AI con el contexto proporcionado."""
     try:
         from groq import Groq
 
-        client = Groq(api_key=settings.gemini_api_key)
+        client = Groq(api_key=settings.roq_api_key)
         
         system_prompt = """
 Eres un asistente médico de MediFlow. Proporciona información útil basada en el contexto, 
@@ -179,13 +179,13 @@ def _build_local_fallback(question: str, context: str, sources: List[str]) -> st
 
 
 def _fallback_response(question: str, context: str, sources: List[str]) -> str:
-    """Respuesta de fallback cuando no hay API key de Gemini."""
+    """Respuesta de fallback cuando no hay API key de Roq AI."""
     base_response = _build_local_fallback(question, context, sources)
 
-    if not settings.gemini_api_key:
+    if not settings.roq_api_key:
         base_response += (
-            "\n\nNota: Esta respuesta se genera localmente porque no se ha configurado GEMINI_API_KEY. "
-            "Para respuestas más personalizadas, configura la clave de API de Gemini."
+            "\n\nNota: Esta respuesta se genera localmente porque no se ha configurado ROQ_API_KEY. "
+            "Para respuestas más personalizadas, configura la clave de API de Roq AI."
         )
 
     return base_response
@@ -196,8 +196,8 @@ def answer_question(question: str) -> Dict[str, Any]:
     docs = _load_documents()
     context, sources = _retrieve_relevant_context(question, docs)
 
-    if settings.gemini_api_key:
-        answer = _generate_gemini_response(question, context)
+    if settings.roq_api_key:
+        answer = _generate_roq_response(question, context)
         if answer:
             return {
                 "question": question,

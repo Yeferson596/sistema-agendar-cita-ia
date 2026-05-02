@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     jwt_exp_hours: int = 168
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://0.0.0.0:3000"
     ai_provider: str = "auto"
-    gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    roq_api_key: str = ""
+    roq_model: str = "llama3-8b-8192"
     openai_api_key: str = ""
     openai_model: str = "gpt-3.5-turbo"
     google_client_id: str = ""

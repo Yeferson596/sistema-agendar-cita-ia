@@ -7,7 +7,7 @@ from app.database import get_db
 from app.deps import get_current_user
 from app.models import User
 from app.schemas import TriageIn, TriageOut, UrgencyEnum
-from app.services.gemini_triage import perform_triage
+from app.services.roq_triage import perform_triage
 
 router = APIRouter(prefix="/triage", tags=["triage"])
 
