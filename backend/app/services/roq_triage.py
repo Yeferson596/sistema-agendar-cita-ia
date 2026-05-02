@@ -266,9 +266,54 @@ def _generate_openai_triage(description: str) -> Dict[str, Any]:
     return {"specialty": parsed.specialty.strip(), "urgency": u, "reasoning": parsed.reasoning.strip()}
 
 
+def _generate_roq_triage(description: str) -> Dict[str, Any]:
+    try:
+        from groq import Groq
+
+        client = Groq(api_key=settings.roq_api_key)
+        
+        system_prompt = """
+Eres un médico especialista en triaje profesional. ANALIZA DETALLADAMENTE LOS SÍNTOMAS DEL PACIENTE Y SE MUY PRECISO.
+
+CLASIFICA CON PRECISIÓN:
+✅ SELECCIONA LA ESPECIALIDAD MÉDICA CORRECTA EXACTAMENTE SEGÚN LOS SÍNTOMAS
+✅ DETERMINA LA URGENCIA REAL CON EVALUACIÓN CLÍNICA:
+  - 🔴 HIGH: síntomas graves que requieren atención inmediata (dolor de pecho, dificultad para respirar, hemorragia, desmayo, fiebre muy alta, dolor insoportable)
+  - 🟡 MEDIUM: síntomas que requieren atención médica pero no son emergencia
+  - 🟢 LOW: síntomas leves, control o consulta rutinaria
+
+DEVUELVE SOLAMENTE UN JSON VALIDO CON ESTOS 3 CAMPOS:
+- specialty: nombre exacto de la especialidad
+- urgency: SOLAMENTE: low, medium, high
+- reasoning: explicación precisa y clínica de por qué le corresponde esa especialidad y urgencia
+        """
+
+        user_prompt = f'Analiza el malestar del paciente y devuelve JSON.\n\nPaciente: "{description}"'
+
+        resp = client.chat.completions.create(
+            model=settings.roq_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.2,
+            max_tokens=250,
+            response_format={ "type": "json_object" }
+        )
+        
+        raw = resp.choices[0].message.content.strip()
+        data = json.loads(raw)
+        parsed = TriageSchema.model_validate(data)
+        u = _normalize_urgency(parsed.urgency)
+        return {"specialty": parsed.specialty.strip(), "urgency": u, "reasoning": parsed.reasoning.strip()}
+    except Exception as e:
+        logger.warning("Roq AI triage failed: %s", e)
+        return None
+
+
 def perform_triage(description: str) -> Dict[str, Any]:
     use_openai = settings.ai_provider in ("openai", "auto") and bool(settings.openai_api_key)
-    use_gemini = settings.ai_provider in ("gemini", "auto") and bool(settings.gemini_api_key)
+    use_roq = settings.ai_provider in ("roq", "auto") and bool(settings.roq_api_key)
 
     if use_openai:
         try:
@@ -276,41 +321,9 @@ def perform_triage(description: str) -> Dict[str, Any]:
         except Exception as e:
             logger.warning("OpenAI triage failed: %s", e)
 
-    if use_gemini:
-        try:
-            from google import genai
-            from google.genai import types
-
-            class TriageJsonModel(BaseModel):
-                specialty: str
-                urgency: str
-                reasoning: str
-
-            client = genai.Client(api_key=settings.gemini_api_key)
-            model = settings.gemini_model
-            resp = client.models.generate_content(
-                model=model,
-                contents=(
-                    f'Analiza el malestar del paciente y devuelve JSON con specialty (nombre corto), '
-                    f'urgency (solo: low, medium, high) y reasoning breve en español.\n\nPaciente: "{description}"'
-                ),
-                config=types.GenerateContentConfig(
-                    system_instruction=(
-                        "Eres un asistente de triaje médico. Clasifica en una especialidad "
-                        "(Pediatría, Odontología, Medicina General, Cardiología, Traumatología, etc.) "
-                        "y nivel de urgencia."
-                    ),
-                    response_mime_type="application/json",
-                    response_schema=TriageJsonModel,
-                ),
-            )
-            text = (resp.text or "").strip()
-            data = json.loads(text)
-            parsed = TriageSchema.model_validate(data)
-            u = _normalize_urgency(parsed.urgency)
-            return {"specialty": parsed.specialty.strip(), "urgency": u, "reasoning": parsed.reasoning.strip()}
-        except Exception as e:
-            logger.warning("Gemini triage failed: %s", e)
-            return _fallback_triage(description)
+    if use_roq:
+        result = _generate_roq_triage(description)
+        if result:
+            return result
 
     return _fallback_triage(description)
