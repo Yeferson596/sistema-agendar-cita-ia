@@ -1,0 +1,6 @@
+{
+  "name": "MediFlow AI",
+  "description": "Sistema inteligente de agendamiento médico con triaje por IA y gestión predictiva de inasistencias.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
