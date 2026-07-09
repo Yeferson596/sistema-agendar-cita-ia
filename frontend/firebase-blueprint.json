@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "Full name" },
+        "email": { "type": "string", "format": "email", "description": "Email address" },
+        "role": { "type": "string", "enum": ["patient", "admin"], "description": "User role" },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Medical appointment details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Appointment ID" },
+        "patientUid": { "type": "string", "description": "UID of the patient" },
+        "patientName": { "type": "string", "description": "Name of the patient" },
+        "description": { "type": "string", "description": "Patient's description of symptoms" },
+        "specialty": { "type": "string", "description": "Assigned specialty" },
+        "urgency": { "type": "string", "enum": ["low", "medium", "high"], "description": "Triage urgency level" },
+        "date": { "type": "string", "format": "date-time", "description": "Scheduled date and time" },
+        "status": { "type": "string", "enum": ["scheduled", "completed", "cancelled", "no-show"], "description": "Appointment status" },
+        "noShowRisk": { "type": "number", "description": "Predicted risk of no-show (0-1)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["patientUid", "description", "specialty", "urgency", "date", "status"]
+    },
+    "Specialty": {
+      "title": "Specialty",
+      "description": "Medical specialty details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Specialty ID" },
+        "name": { "type": "string", "description": "Name of the specialty" },
+        "description": { "type": "string", "description": "Description of the specialty" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Appointment documents"
+    },
+    "/specialties/{specialtyId}": {
+      "schema": "Specialty",
+      "description": "Medical specialty documents"
+    }
+  }
+}

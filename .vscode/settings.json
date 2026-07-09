@@ -1,0 +1,4 @@
+{
+    "CodeGPT.apiKey": "DeepSeek",
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
